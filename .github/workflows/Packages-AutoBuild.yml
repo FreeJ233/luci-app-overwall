@@ -145,16 +145,18 @@ jobs:
     - name: Check space usage
       run: df -hT
 
-      - name: Copy Bin Files
-        run: |
-          find "openwrt/bin/" -type f -name "*overwall*.ipk" -exec cp {} "${{ github.workspace }}" \;
-          find "${{ github.workspace }}" -type f -name "*.ipk" -exec ls -lh {} \;
-      - name: Release and Upload Assets
-        uses: softprops/action-gh-release@v1
-        with:
+    - name: Copy Bin Files
+      run: |
+        find "openwrt/bin/" -type f -name "*overwall*.ipk" -exec cp {} "${{ github.workspace }}" \;
+        find "${{ github.workspace }}" -type f -name "*.ipk" -exec ls -lh {} \;
+    - name: Release and Upload Assets
+      uses: softprops/action-gh-release@v1
+      with:
           files: '*.ipk'
-        env:
+      env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          
 
   notify:
     name: Notify Release Publish
