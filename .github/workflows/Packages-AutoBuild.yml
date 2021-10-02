@@ -103,6 +103,8 @@ jobs:
         cp -rf devices/common/. ./
         cp -rf devices/${{matrix.target}}/. ./
         ./scripts/feeds update -a
+        ln -s "${{ github.workspace }}" "package/$PACKAGE_NAME"
+        ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
@@ -137,11 +139,9 @@ jobs:
         cd openwrt
         make defconfig
         echo -e "$(($(nproc)+1)) thread compile"
-        mv -f package/feeds/custom custom.b
-        mkdir package/feeds/custom
-        mv -f custom.b/luci-app-overwall package/feeds/custom/
         make package/luci-app-overwall/compile -j$(($(nproc)+1)) || make package/luci-app-overwall/compile -j1 V=s
 
+        
     - name: Check space usage
       run: df -hT
 
