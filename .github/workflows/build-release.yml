@@ -48,7 +48,7 @@ jobs:
           key: openwrt-${{ matrix.arch }}-${{ env.PACKAGE_NAME }}-${{ steps.cache_key.outputs.timestamp }}
           restore-keys: |
             openwrt-${{ matrix.arch }}-${{ env.PACKAGE_NAME }}-
-      - name: Install Dependencies
+    - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
