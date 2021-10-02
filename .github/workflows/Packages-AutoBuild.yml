@@ -103,7 +103,7 @@ jobs:
         cp -rf devices/common/. ./
         cp -rf devices/${{matrix.target}}/. ./
         ./scripts/feeds update -a
-        ln -s "${{ github.workspace }}" "package/$PACKAGE_NAME"
+        ln -s "${{ github.workspace }}/luci-app-overwall" "package/luci-app-overwall"
         ./scripts/feeds install -a
 
     - name: Load custom configuration
@@ -145,51 +145,33 @@ jobs:
     - name: Check space usage
       run: df -hT
 
-    - name: Organize files
-      id: organize
-      run: |
-        mkdir packages
-        cp -Rf openwrt/bin/packages/*/custom/* packages/ || true
-        cp openwrt/error*.log  packages/ || true
-        echo "FIRMWARE=$PWD/packages" >> $GITHUB_ENV
-        Emoji=("🎉" "🤞" "✨" "🎁" "🎈" "🎄" "🎨" "💋" "🍓" "🍕" "🍉" "💐" "🌴" "🚀" "🛸" "🗽" "⛅" "🌈" "🔥" "⛄" "🐶" "🏅" "🦄" "🐤")
-        RANDOM=$$$(date +%s)
-        rand=$[$RANDOM % ${#Emoji[@]}]
-        echo "EMOJI=${Emoji[$rand]}" >> $GITHUB_ENV
-        if [[ $(ls -l packages/error* | grep "^-" | wc -l) -le 0 ]]; then
-           echo "DEPLOY=1" >> $GITHUB_ENV
-        fi
-        
-    - name: Create release
-      id: create_release
-      if: env.REPO_TOKEN
-      continue-on-error: true
-      run: |
-        echo -e "" >> release.txt
+      - name: Copy Bin Files
+        run: |
+          find "openwrt/bin/" -type f -name "*overwall*.ipk" -exec cp {} "${{ github.workspace }}" \;
+          find "${{ github.workspace }}" -type f -name "*.ipk" -exec ls -lh {} \;
+      - name: Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: '*.ipk'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Upload packages for release
-      uses: softprops/action-gh-release@v1
-      continue-on-error: true
-      if: env.REPO_TOKEN && env.DEPLOY
-      env:
-        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-      with:
-        files: "${{ env.FIRMWARE }}/*"
-        name: Bypass for ${{ env.MTARGET }} ${{ env.EMOJI }} ${{ env.date2 }}
-        tag_name: ${{ env.date }}_${{ env.MTARGET }}
-        body_path: release.txt
-
-    - name: Delete workflow runs
-      uses: GitRML/delete-workflow-runs@main
-      with:
-        retain_days: 6
-        keep_minimum_runs: 1
-
-    - name: Remove old Releases
-      uses: dev-drprasad/delete-older-releases@master
-      continue-on-error: true
-      with:
-        keep_latest: 15
-        delete_tags: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+  notify:
+    name: Notify Release Publish
+    runs-on: ubuntu-latest
+    env:
+      TRIGGER_URL: ${{ secrets.TRIGGER_URL }}
+      TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
+    needs: release
+    steps:
+      - name: Notify Jenkins
+        run: |
+          if [ -z "$TRIGGER_URL" ] ; then
+            echo "::warning::No trigger url found, skip..."
+            exit 0
+          fi
+          curl -X POST \
+              -H "Content-Type: application/json; charset=utf-8" \
+              -H "Authorization: Bearer $TRIGGER_TOKEN" \
+              -d "{\"event\":\"release\",\"repository\":\"${{ github.repository }}\",\"ref\":\"${{ github.ref }}\"}" \
+              "$TRIGGER_URL" || true
