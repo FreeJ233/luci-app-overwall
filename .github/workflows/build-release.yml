@@ -9,6 +9,7 @@ on:
 env:
   PACKAGE_NAME: luci-app-overwall
   CACHE_DIR: ~/cache
+  TZ: Asia/Shanghai
 
 jobs:
   release:
