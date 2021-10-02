@@ -137,11 +137,11 @@ jobs:
     - name: Check space usage
       run: df -hT
       
-      - name: Copy Bin Files
-        run: |
-          find "$SDK_HOME/bin/" -type f -name "*overwall*.ipk" -exec cp {} "${{ github.workspace }}" \;
-          find "${{ github.workspace }}" -type f -name "*.ipk" -exec ls -lh {} \;
-          
+    - name: Copy Bin Files
+      run: |
+        find "$SDK_HOME/bin/" -type f -name "*overwall*.ipk" -exec cp {} "${{ github.workspace }}" \;
+        find "${{ github.workspace }}" -type f -name "*.ipk" -exec ls -lh {} \;
+         
     - name: Organize files
       id: organize
       run: |
