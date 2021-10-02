@@ -10,7 +10,6 @@ name: Packages-AutoBuild
 
 on: 
   repository_dispatch:
-
   # push: 
   #   branches:
   #     - master
@@ -139,7 +138,7 @@ jobs:
         echo -e "$(($(nproc)+1)) thread compile"
         mv -f package/feeds/custom custom.b
         mkdir package/feeds/custom
-        mv -f custom.b/{luci-app-overwall} package/feeds/custom/
+        mv -f custom.b/luci-app-overwall package/feeds/custom/
         make package/luci-app-overwall/compile -j$(($(nproc)+1)) || make package/luci-app-overwall/compile -j1 V=s
 
     - name: Check space usage
