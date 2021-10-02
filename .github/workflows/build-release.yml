@@ -9,7 +9,7 @@ on:
 env:
   PACKAGE_NAME: luci-app-overwall
   CACHE_DIR: ~/cache
-  TZ: Asia/Shanghai
+
 
 jobs:
   release:
@@ -20,11 +20,11 @@ jobs:
       matrix:
         include:
           - arch: mipsel_24kc
-            sdk_url_path: https://downloads.openwrt.org/releases/21.02-SNAPSHOT/targets/ramips/mt7621
-            sdk_name: -sdk-21.02-SNAPSHOT-ramips-mt7621_
-          - arch: x86_64
-            sdk_url_path: https://downloads.openwrt.org/releases/21.02-SNAPSHOT/targets/x86/64
-            sdk_name: -sdk-21.02-SNAPSHOT-x86-64_
+            sdk_url_path: https://downloads.openwrt.org/snapshots/targets/ramips/mt7621
+            sdk_name: -sdk-ramips-mt7621_
+#          - arch: x86_64
+#            sdk_url_path: https://downloads.openwrt.org/snapshots/targets/x86/64
+#            sdk_name: -sdk-x86-64_
 
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
