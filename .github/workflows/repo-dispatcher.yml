@@ -33,14 +33,14 @@ jobs:
     - name: Trigger Packages Update
       run: |
         sudo timedatectl set-timezone "$TZ"
-        curl -X POST https://api.github.com/repos/garypang13/openwrt-packages/dispatches \
+        curl -X POST https://api.github.com/repos/xdun/luci-app-action/dispatches \
         -H "Accept: application/vnd.github.everest-preview+json" \
         -H "Authorization: token ${{ secrets.REPO_TOKEN }}" \
         --data '{"event_type": "update"}'
 
     - name: Trigger matrix Update
       run: |
-        gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/garypang13/openwrt-packages/commits?&per_page=1" | jq -r '.[0].commit.committer.date')
+        gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/xdun/luci-app-action/openwrt-packages/commits?&per_page=1" | jq -r '.[0].commit.committer.date')
         gitdate=$(date -d "$gitdate" +%s)
         now=$(date -d "$(date '+%Y-%m-%d %H:%M:%S')" +%s)
         if [[ $(expr $gitdate + 90000) < $now ]]; then

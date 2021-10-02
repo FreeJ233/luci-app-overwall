@@ -37,11 +37,11 @@ jobs:
 
     - name: Trigger Packages Update
       run: |
-        gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/garypang13/openwrt-packages/actions/runs" | jq -r '.workflow_runs[0].created_at')
+        gitdate=$(curl -H "Authorization: token ${{ secrets.REPO_TOKEN }}" -s "https://api.github.com/repos/xdun/luci-app-action/actions/runs" | jq -r '.workflow_runs[0].created_at')
         gitdate=$(date -d "$gitdate" +%s)
         now=$(date -d "$(date '+%Y-%m-%d %H:%M:%S')" +%s)
         if [[ $(expr $gitdate + 60) < $now ]]; then
-        curl -X POST https://api.github.com/repos/garypang13/openwrt-packages/dispatches \
+        curl -X POST https://api.github.com/repos/xdun/luci-app-action/dispatches \
         -H "Accept: application/vnd.github.everest-preview+json" \
         -H "Authorization: token ${{ secrets.REPO_TOKEN }}" \
         --data '{"event_type": "update"}'
@@ -138,8 +138,8 @@ jobs:
         echo -e "$(($(nproc)+1)) thread compile"
         mv -f package/feeds/custom custom.b
         mkdir package/feeds/custom
-        mv -f custom.b/{luci-app-bypass,lua-maxminddb,smartdns-le} package/feeds/custom/
-        make package/luci-app-bypass/compile -j$(($(nproc)+1)) || make package/luci-app-bypass/compile -j1 V=s
+        mv -f custom.b/{luci-app-overwall} package/feeds/custom/
+        make package/luci-app-overwall/compile -j$(($(nproc)+1)) || make package/luci-app-overwall/compile -j1 V=s
 
     - name: Check space usage
       run: df -hT
