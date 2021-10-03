@@ -14,7 +14,7 @@ env:
 jobs:
   release:
     name: Build for ${{ matrix.arch }}
-    runs-on: Ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
